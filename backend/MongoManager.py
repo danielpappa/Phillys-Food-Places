@@ -37,7 +37,7 @@ class MongoManager:
 
         return collection
 
-    def vector_search(self, query):
+    def vector_search(self, query, collection):
 
         embedding = embedder.Embedder("thenlper/gte-large")
 
@@ -67,5 +67,5 @@ class MongoManager:
             },
         ]
 
-        results = self.set_mongo_db().aggregate(pipeline)
+        results = collection.aggregate(pipeline)
         return list(results)
