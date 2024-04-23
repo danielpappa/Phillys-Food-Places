@@ -53,7 +53,7 @@ class MongoManager:
                     "queryVector": query_embedding,
                     "path": "review_embedding",
                     "numCandidates": 3000,
-                    "limit": 5, 
+                    "limit": 10, 
                 }
             },
             {
