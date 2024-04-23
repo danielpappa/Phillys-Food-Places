@@ -39,7 +39,7 @@ class TextGenerator:
 
         return search_info
     
-    def generate_response(self, query):
+    def generate_response(self, query, history):
         sources = self.get_search_info(query)
         rag_padding = (
             f"Query: {query}\n\nI'm answering based on the following potential matches:\n\n{sources}\n\nLLM:"
