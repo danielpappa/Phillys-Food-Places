@@ -25,7 +25,7 @@ class MongoManager:
         if not self.mongo_uri:
             print("Mongo_uri missing or not set")
 
-        mongo_client = self.get_mongo_client(self.mongo_uri)
+        mongo_client = self.get_mongo_client()
 
         db = mongo_client["restaurants"]
         collection = db["philadelphia"]
