@@ -4,30 +4,28 @@ import os
 import pandas as pd
 from datasets import load_dataset
 
-tokenizer = AutoTokenizer.from_pretrained('google/gemma-2b-it')
-model = AutoModelForCausalLM.from_pretrained('google/gemma-2b-it') # for Gpu: , device_map = 'auto')
-
-mongo_manager = MM.MongoManager(os.getenv('MONGO_URI'))
-
-def setup_collection(dataset):
-
-    df = load_dataset(dataset)
-    df = pd.DataFrame(df["train"])
-    df = df.drop(columns=["Unnamed: 0"])
-
-    df = mongo_manager.get_dataframe(df)
-    collection = mongo_manager.set_mongo_db(df)
-
-    return collection
-
 class TextGenerator:
 
-    def __init__(self, collection):
-        self.collection = collection
+    def __init__(self, pretrained, dataset):
+        self.tokenizer = AutoTokenizer.from_pretrained(pretrained)
+        self.model = AutoModelForCausalLM.from_pretrained(pretrained) # for Gpu: , device_map = 'auto')
+        self.mongo_manager = MM.MongoManager(os.getenv('MONGO_URI'))
+        self.dataset = dataset
     
+    def setup_collection(self):
+
+        df = load_dataset(self.dataset)
+        df = pd.DataFrame(df["train"])
+        df = df.drop(columns=["Unnamed: 0"])
+
+        df = self.mongo_manager.get_dataframe(df)
+        collection = self.mongo_manager.set_mongo_db(df)
+
+        return collection
+
     def get_search_info(self, query):
 
-        information = mongo_manager.vector_search(query, self.collection)
+        information = self.mongo_manager.vector_search(query, self.setup_collection())
 
         search_info = ""
 
@@ -44,7 +42,7 @@ class TextGenerator:
         rag_padding = (
             f"Query: {query}\n\nI'm answering based on the following potential matches:\n\n{sources}\n\nLLM:"
         )
-        input_ids = tokenizer(rag_padding, return_tensors="pt") #if Gpu: .to("cuda")
-        response = model.generate(**input_ids, max_new_tokens=500)
-        rag_text = tokenizer.decode(response[0]).split("LLM:")[-1]
+        input_ids = self.tokenizer(rag_padding, return_tensors="pt") #if Gpu: .to("cuda")
+        response = self.model.generate(**input_ids, max_new_tokens=500)
+        rag_text = self.tokenizer.decode(response[0]).split("LLM:")[-1]
         return rag_text.split("<eos>")[0]
