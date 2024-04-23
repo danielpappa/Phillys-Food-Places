@@ -52,8 +52,8 @@ class MongoManager:
                     "index": "index_food",
                     "queryVector": query_embedding,
                     "path": "review_embedding",
-                    "numCandidates": 150,
-                    "limit": 5,  # Return top 2 matches
+                    "numCandidates": 3000,
+                    "limit": 5, 
                 }
             },
             {

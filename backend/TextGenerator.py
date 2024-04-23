@@ -25,7 +25,8 @@ class TextGenerator:
 
     def get_search_info(self, query):
 
-        information = self.mongo_manager.vector_search(query, self.setup_collection())
+        collection = self.setup_collection()
+        information = self.mongo_manager.vector_search(query, collection)
 
         search_info = ""
 
