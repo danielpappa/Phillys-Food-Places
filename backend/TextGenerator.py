@@ -11,6 +11,7 @@ class TextGenerator:
         self.model = AutoModelForCausalLM.from_pretrained(pretrained) # for Gpu: , device_map = 'auto')
         self.mongo_manager = MM.MongoManager(os.getenv('MONGO_URI'))
         self.dataset = dataset
+        self.collection = self.setup_collection()
     
     def setup_collection(self):
 
@@ -25,8 +26,7 @@ class TextGenerator:
 
     def get_search_info(self, query):
 
-        collection = self.setup_collection()
-        information = self.mongo_manager.vector_search(query, collection)
+        information = self.mongo_manager.vector_search(query, self.collection)
 
         search_info = ""
 
