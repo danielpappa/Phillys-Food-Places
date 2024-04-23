@@ -8,6 +8,8 @@ tokenizer = AutoTokenizer.from_pretrained('google/gemma-2b-it')
 model = AutoModelForCausalLM.from_pretrained('google/gemma-2b-it') # for Gpu: , device_map = 'auto')
 
 df = load_dataset("danielpappa/philly_restaurants")
+df = pd.DataFrame(df["train"])
+df = df.drop(columns=["Unnamed: 0"])
 mongo_manager = MongoManager(os.getenv('MONGO_URI'), df)
 df = mongo_manager.update_dataframe(df)
 collection = mongo_manager.set_mongo_db()
