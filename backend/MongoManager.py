@@ -1,9 +1,6 @@
 import pymongo
-import Embedder
 import json
-import pandas
-import os
-
+import backend.Embedder as embedder
 class MongoManager:
 
     def __init__(self, mongo_uri):
@@ -34,3 +31,33 @@ class MongoManager:
 
         return collection
 
+    def vector_search(self, query):
+
+        query_embedding = embedder.get_embedding(query)
+
+        if query_embedding is None:
+            return "Invalid query or embedding generation failed"
+
+        pipeline = [
+            {
+                "$vectorSearch": {
+                    "index": "index_food",
+                    "queryVector": query_embedding,
+                    "path": "review_embedding",
+                    "numCandidates": 150,
+                    "limit": 5,  # Return top 2 matches
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "name": 1,
+                    "stars": 1,
+                    "text": 1,
+                    "score": {"$meta": "vectorSearchScore"},
+                }
+            },
+        ]
+
+        results = self.set_mongo_db().aggregate(pipeline)
+        return list(results)
