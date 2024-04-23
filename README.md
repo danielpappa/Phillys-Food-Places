@@ -1,5 +1,5 @@
 ---
-title: Fantasy Stonks Assistant
+title: Phillys-Food-Places
 emoji: 🍣
 colorFrom: yellow
 colorTo: red
