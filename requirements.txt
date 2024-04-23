@@ -1,0 +1,6 @@
+sentence_transformers
+pymongo
+transformers
+torch
+accelerate
+datasets
