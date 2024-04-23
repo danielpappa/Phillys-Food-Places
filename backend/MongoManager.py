@@ -1,6 +1,7 @@
 import pymongo
 import json
-import backend.Embedder as Embedder
+import backend.Embedder as embedder
+
 class MongoManager:
 
     def __init__(self, mongo_uri):
@@ -19,7 +20,7 @@ class MongoManager:
             print(f"Connection failed: {e}")
             return None
         
-    def set_mongo_db(self):
+    def set_mongo_db(self, dataframe):
 
         if not self.mongo_uri:
             print("Mongo_uri missing or not set")
@@ -29,11 +30,16 @@ class MongoManager:
         db = mongo_client["restaurants"]
         collection = db["philadelphia"]
 
+        collection.delete_many({})
+        documents = dataframe.to_dict("records")
+        collection.insert_many(documents)
+        print("Insertion worked out")
+
         return collection
 
     def vector_search(self, query):
 
-        embedding = Embedder("thenlper/gte-large")
+        embedding = embedder.Embedder("thenlper/gte-large")
 
         query_embedding = embedding.get_embedding(query)
 

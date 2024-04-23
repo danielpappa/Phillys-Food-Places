@@ -7,13 +7,18 @@ from datasets import load_dataset
 tokenizer = AutoTokenizer.from_pretrained('google/gemma-2b-it')
 model = AutoModelForCausalLM.from_pretrained('google/gemma-2b-it') # for Gpu: , device_map = 'auto')
 
-df = load_dataset("danielpappa/philly_restaurants")
-df = pd.DataFrame(df["train"])
-df = df.drop(columns=["Unnamed: 0"])
-mongo_manager = MM(os.getenv('MONGO_URI'))
-df = mongo_manager.update_dataframe(df)
-collection = mongo_manager.set_mongo_db()
-mongo_manager.update_collection(collection)
+mongo_manager = MM.MongoManager(os.getenv('MONGO_URI'))
+
+def setup_collection(dataset):
+
+    df = load_dataset(dataset)
+    df = pd.DataFrame(df["train"])
+    df = df.drop(columns=["Unnamed: 0"])
+
+    df = mongo_manager.get_dataframe(df)
+    collection = mongo_manager.set_mongo_db(df)
+
+    return collection
 
 class TextGenerator:
 
