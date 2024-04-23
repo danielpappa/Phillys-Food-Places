@@ -1,6 +1,6 @@
 import pymongo
 import json
-import backend.Embedder as embedder
+import backend.Embedder as Embedder
 class MongoManager:
 
     def __init__(self, mongo_uri):
@@ -10,9 +10,9 @@ class MongoManager:
         dataframe['review_embedding'] = dataframe["review_embedding"].apply(json.loads)
         return dataframe
     
-    def get_mongo_client(self, mongo_uri):
+    def get_mongo_client(self):
         try:
-            client = pymongo.MongoClient(mongo_uri)
+            client = pymongo.MongoClient(self.mongo_uri)
             print("Connection to MongoDB successful")
             return client
         except pymongo.errors.ConnectionFailure as e:
@@ -33,7 +33,9 @@ class MongoManager:
 
     def vector_search(self, query):
 
-        query_embedding = embedder.get_embedding(query)
+        embedding = Embedder("thenlper/gte-large")
+
+        query_embedding = embedding.get_embedding(query)
 
         if query_embedding is None:
             return "Invalid query or embedding generation failed"
